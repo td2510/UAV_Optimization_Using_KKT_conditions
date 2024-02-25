@@ -23,8 +23,8 @@ v_0 = sqrt(W/(2*rho*A)); C = 1/(4*v_0^4);  D = sqrt(C);
 P_c1 = P_c.*ones(1,N);
 
 y_j = sqrt( (delta_t.^4 + D.^2.*(sum((q_j_22 - q_j_21).^2)).^2 ).^0.5- D*sum((q_j_22 - q_j_21).^2) );%44
-while ((err>epsilon)&&(iter<=3))
-
+% while ((err>epsilon)&&(iter<=3))
+while ((err>epsilon)&&(iter<=5))
 %% Run the CVX to solve the problem P3.2
 cvx_begin %quiet
    variable q(3,N+1) %???
@@ -66,6 +66,11 @@ cvx_begin %quiet
     q(2,:) >= 0; % Keep for y value >= 0
     q(3,:) >= 3; %???
     q(3,:) <= 10; %???
+    z_1(1, :) >= 0;
+    z_2(1, :) >= 0;
+    z1_Taylor(1,:) >= 0;
+    Theta_1(1, :) >= 0;
+    Theta_2(1, :) >= 0;
     %% energy constraint
     E_fly = cvx(zeros(1,N));
     for n=1:N

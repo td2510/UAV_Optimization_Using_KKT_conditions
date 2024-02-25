@@ -2,7 +2,6 @@ function [P_un,P_sn,g_x]= Optimize_P_1(P_u1,P_s1,tau_j,eta_j,N,q_j_1)
 
 global P_s V_max sigma_sq H delta_t omega_0 P_c alpha miu q_I1 q_F1 w_s ....
     w_d epsilon sigma Euler eta_max S E_tot Theta Theta_0 P_u P_h
-% plot3(q_j_1(1,:),q_j_1(2,:),q_j_1(3,:));
 start_CVX = tic;
 
 err = 1.0;
@@ -25,7 +24,8 @@ q_j_12 = q_j_1(:,[2:N+1]);
 
 
 y_j = sqrt( (delta_t.^4 + D.^2.*(sum((q_j_12 - q_j_11).^2)).^2 ).^0.5- D*sum((q_j_12 - q_j_11).^2) );%44
-while ((err>epsilon)&&(iter<=3))
+% while ((err>epsilon)&&(iter<=3))
+while ((err>epsilon)&&(iter<=5))
 %% Run the CVX to solve the problem P3.2
 cvx_begin %quiet
    variable P_un(1,N)

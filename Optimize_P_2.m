@@ -2,7 +2,6 @@ function [P_un,P_sn,g_x]= Optimize_P_2(P_u1,P_s1,tau_j,eta_j,N,q_j_2)
 
 global P_s V_max sigma_sq H delta_t omega_0 P_c alpha miu q_I2 q_F2 w_s ....
     w_d epsilon sigma Euler eta_max S E_tot Theta Theta_0 P_u P_h
-% plot3(q_j_2(1,:),q_j_2(2,:),q_j_2(3,:));
 start_CVX = tic;
 
 err = 1.0;
@@ -25,7 +24,7 @@ q_j_22 = q_j_2(:,[2:N+1]);
 
 
 y_j = sqrt( (delta_t.^4 + D.^2.*(sum((q_j_22 - q_j_21).^2)).^2 ).^0.5- D*sum((q_j_22 - q_j_21).^2) );%44
-while ((err>epsilon)&&(iter<=3))
+while ((err>epsilon)&&(iter<=5))
 %% Run the CVX to solve the problem P3.2
 cvx_begin %quiet
    variable P_un(1,N)
@@ -39,6 +38,9 @@ cvx_begin %quiet
     
    Theta_1 = log2(1+Theta_0.*P_s1./z_1j)+...
        (Theta_0.*(P_sn-P_s1)./log(2))./(z_1j+Theta_0.*P_s1);
+%    Theta_2 = log2(1+Theta.*(eta_j.*omega_0.*P_s1 + bar_P_u.*z_1j)./(z_1j.*z_2j) )...
+%         +(Theta.*eta_j.*omega_0.*(P_sn-P_s1)+Theta.*z_1j.*(ceil(sigma)).*(P_un-P_u1))...
+%         ./log(2)./((z_1j.*z_2j)+Theta.*eta_j.*omega_0.*P_s1+Theta.*z_1j.*bar_P_u);
    Theta_2 = log2(1+Theta.*(eta_j.*omega_0.*P_s1 + bar_P_u.*z_1j)./(z_1j.*z_2j) )...
         +(Theta.*eta_j.*omega_0.*(P_sn-P_s1)+Theta.*z_1j.*(1+ceil(sigma)).*(P_un-P_u1))...
         ./log(2)./((z_1j.*z_2j)+Theta.*eta_j.*omega_0.*P_s1+Theta.*z_1j.*bar_P_u);
@@ -59,7 +61,7 @@ cvx_begin %quiet
     P_un >= 0;
     P_un <= 4;
     P_sn >= 0;
-    (P_un+P_sn) <= 45;
+    (P_un+P_sn) <= 100;
     (P_un+P_sn) >= 0;
     %% energy constraint
 %      sum(E_fly+tau_j.*delta_t.*(P_c1+P_un)) <= sum((miu.*(1-tau_j).*delta_t.*omega_0.*P_h)./z_1j);

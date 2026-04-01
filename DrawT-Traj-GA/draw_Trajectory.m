@@ -1,10 +1,10 @@
 %% Test plot Trajectory
 clear; clc; close all;
-load('Ph=1e7_2.mat')
+load('Traj.mat')
 figure(1)
-plot3(q_L_11e7(1,:),q_L_11e7(2,:),q_L_11e7(3,:),'b-','LineWidth',1)
+plot3(q_L_1(1,:),q_L_1(2,:),q_L_1(3,:),'b-','LineWidth',1)
 hold on
-plot3(q_L_21e7(1,:),q_L_21e7(2,:),q_L_21e7(3,:),'r-','LineWidth',1)
+plot3(q_L_2(1,:),q_L_2(2,:),q_L_2(3,:),'r-','LineWidth',1)
 hold on
 scatter3(15, 0, 0, 'filled', 'Marker', '^', 'DisplayName', 'My Point')
 hold on

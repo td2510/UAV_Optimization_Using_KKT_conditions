@@ -5,6 +5,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
+import pdb
 
 # H = 10
 V = 20
@@ -13,15 +14,13 @@ t = 0.5
 d = V*t
 X = 20
 Y = 10
-Y2 = 5
+Y2 = 10
 Z = 10 
 Z2 = 5
 w_s = [5, 0, 0] 
 w_d = [15, 0, 0]
 q_I1 = [0, 10, 10]
 q_F1 = [20, 10, 10]
-# q_I2 = [0, 5, 5]
-# q_F2 = [20, 5, 5]
 q_I2 = [0, 10, 5]
 q_F2 = [20, 10, 5]
 N = int(T/t)
@@ -44,15 +43,15 @@ a2 = alpha/2
 B = 20
 w_0 = 10**(-3)
 
-xichma = 0.3
+xichma = 0.45
 n_u = 0.5
-P_u = 4  # 7.5 mW
+P_u = 5  # 7.5 mW
 P_b = 10**(-3)
-P_s = 41  # 16dBm
+P_s = 55  # 16dBm
 xich_ma_u = 10**(-6)
 nguy = 0.5
 P_wpt = 1*10**7
-S = 50
+S = 70
 micro = 0.84
 
 v_0 = sqrt(W / (2 * p * A))
@@ -62,7 +61,7 @@ k_1 = 3 / om**2 / R**2
 P_1 = (1 + I) * W**1.5 / sqrt(2*p*A)
 k_2 = 1 / 2 / v_0**2
 k_3 = 0.5 * d_0 * p * s * A
-
+theta = e**(-E) * w_0 / xich_ma_u
 
 def ceil(x: float) -> int:
     """
@@ -89,7 +88,6 @@ def distance2(x, y):
     """
     return (x[0]-y[0])**2 + (x[1]-y[1])**2 + (x[2] - y[2])**2
 
-
 def distance(x, y):
     """
         Calculate distance euclid between two point X, Y
@@ -97,11 +95,6 @@ def distance(x, y):
         return distance
     """
     return sqrt(distance2(x, y))
-
-
-# P_u_bar = P_u * (1 + ceil(xichma))
-theta = e**(-E) * w_0 / xich_ma_u
-
 
 def fitness1(c, log=False):
     """
@@ -152,7 +145,7 @@ def fitness1(c, log=False):
 
         # e_fly at time slot i
         # formula (8)
-        e_fly_i = P_0 * (t + k_1 * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
+        e_fly_i = P_0 * (t + (k_1 / t) * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
                                                         k_2 * dis**2) + k_3 * dis**3 / t**2 + tau[i] * t * (P_b + u[i]*P_u)
         e_fly = e_fly + e_fly_i
 
@@ -230,7 +223,7 @@ def fitness2(c, log=False):
 
         # e_fly at time slot i
         # formula (8)
-        e_fly_i = P_0 * (t + k_1 * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
+        e_fly_i = P_0 * (t + (k_1 / t) * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
                                                         k_2 * dis**2) + k_3 * dis**3 / t**2 + tau[i] * t * (P_b + u[i]*P_u)
         e_fly = e_fly + e_fly_i
 
@@ -279,12 +272,12 @@ def init_one_child1():
         i, j, e = i * X, j * Y, e * Z # scale from (0, 1) to real
         _i = random.uniform(0, 1)  # random x location at time slot i
         _j = random.uniform(0, 1)  # random y location at time slot i
-        _e = random.uniform(0, 1)  # random z location at time slot i
+        _e = random.uniform(0.3, 1) # random z location at time slot i
         _tau = random.uniform(0, 1)  # random tau at time slot i
         _u = random.uniform(0, 1)  # random Pu at time slot i
         _s = random.uniform(0, 1)  # random Ps at time slot i
         dis = distance([i, j, e], [_i * X, _j * Y, _e * Z])  # distance from Q_i-1 to Q_i
-        e_fly_i = P_0 * (t + k_1 * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
+        e_fly_i = P_0 * (t + (k_1 / t) * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
                                                         k_2 * dis**2) + k_3 * dis**3 / t**2 + _tau * t * (P_b + _u*P_u)
         e_h_i = micro * (1 - _tau) * t * w_0 * \
             P_wpt / (distance([i, j, e], w_s))**a2
@@ -295,12 +288,12 @@ def init_one_child1():
                 return None
             _i = random.uniform(0, 1)
             _j = random.uniform(0, 1)
-            _e = random.uniform(0, 1)
+            _e = random.uniform(0.3, 1)
             _tau = random.uniform(0, 1)
             _u = random.uniform(0, 1)  
             _s = random.uniform(0, 1)
             dis = distance([i, j, e], [_i * X, _j * Y, _e * Z])
-            e_fly_i = P_0 * (t + k_1 * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
+            e_fly_i = P_0 * (t + (k_1 / t) * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
                                                             k_2 * dis**2) + k_3 * dis**3 / t**2 + _tau * t * (P_b + _u*P_u)
             e_h_i = micro * (1 - _tau) * t * w_0 * \
                 P_wpt / (distance([i, j, e], w_s))**a2
@@ -344,12 +337,12 @@ def init_one_child2():
         i, j, e = i * X, j * Y2, e * Z2 # scale from (0, 1) to real
         _i = random.uniform(0, 1)  # random x location at time slot i
         _j = random.uniform(0, 1)  # random y location at time slot i
-        _e = random.uniform(0.2, 1)  # random z location at time slot i
+        _e = random.uniform(0.3, 1)  # random z location at time slot i
         _tau = random.uniform(0, 1)  # random tau at time slot i
         _u = random.uniform(0, 1)  # random Pu at time slot i
         _s = random.uniform(0, 1)  # random Ps at time slot i
         dis = distance([i, j, e], [_i * X, _j * Y2, _e * Z2])  # distance from Q_i-1 to Q_i
-        e_fly_i = P_0 * (t + k_1 * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
+        e_fly_i = P_0 * (t + (k_1 / t) * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
                                                         k_2 * dis**2) + k_3 * dis**3 / t**2 + _tau * t * (P_b + _u*P_u)
         e_h_i = micro * (1 - _tau) * t * w_0 * \
             P_wpt / (distance([i, j, e], w_s))**a2
@@ -360,12 +353,12 @@ def init_one_child2():
                 return None
             _i = random.uniform(0, 1)
             _j = random.uniform(0, 1)
-            _e = random.uniform(0.2, 1)
+            _e = random.uniform(0.3, 1)
             _tau = random.uniform(0, 1)
             _u = random.uniform(0, 1)  
             _s = random.uniform(0, 1)
             dis = distance([i, j, e], [_i * X, _j * Y2, _e * Z2])
-            e_fly_i = P_0 * (t + k_1 * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
+            e_fly_i = P_0 * (t + (k_1 / t) * dis**2) + P_1 * sqrt(sqrt(t**4 + k_2**2 * dis**4) -
                                                             k_2 * dis**2) + k_3 * dis**3 / t**2 + _tau * t * (P_b + P_u)
             e_h_i = micro * (1 - _tau) * t * w_0 * \
                 P_wpt / (distance([i, j, e], w_s))**a2
@@ -399,20 +392,54 @@ def linear_cross_over(_f, _m):
     """
     c1, c2 = _f.copy(), _m.copy()
     u = random.uniform(0, 1)
-    for i in range(4*N1):
+    # for i in range(4*N1):
+    for i in range(6*N1):
         c1[i] = u * _f[i] + (1 - u)*_m[i]
         c2[i] = (1 - u)*_f[i] + u * _m[i]
     return c1, c2
 
-
-def laplace_cross_over(_f, _m):
+def twopoint_cross_over(_f, _m):
     c1, c2 = _f.copy(), _m.copy()
-    b = np.random.laplace(0., 1., 1)[0]/10
-    for i in range(4*N1):
-        c1[i] = _f[i] + b * abs(_f[i] - _m[i])
-        c2[i] = _m[i] + b * abs(_f[i] - _m[i])
+
+    # Choose two random crossover points
+    # point1, point2 = sorted(random.sample(range(4 * N1), 2))
+    point1, point2 = sorted(random.sample(range(6 * N1), 2))
+
+    for i in range(point1, point2 + 1):
+        c1[i], c2[i] = _m[i], _f[i]
+
     return c1, c2
 
+def binary_cross_over(_f, _m):
+    """
+        Cross over from parents
+        @parameter:
+            _f: father
+            _m: mother
+        @return: 2 children from parents
+    """
+    c1, c2 = _f.copy(), _m.copy()
+    n = 2
+    u = random.uniform(0, 1)
+    if u <= 0.5:
+        b = (2*u) ** (1 / (n + 1))
+    else:
+        b = (1 / 2 / (1 - u)) ** (1 / (n + 1))
+    for i in range(3*N1):
+        x1 = 0.5 * ((1 + b) * _f[i] + (1 - b) * _m[i])
+        x2 = 0.5 * ((1 - b) * _f[i] + (1 + b) * _m[i])
+        if i >= 2*N1:
+            if x1 > 1:
+                x1 = 1
+            if x1 < 0:
+                x1 = 0
+            if x2 > 1:
+                x2 = 1
+            if x2 < 0:
+                x2 = 0
+        c1[i] = x1
+        c2[i] = x2
+    return c1, c2
 
 X1 = list(range(1, N))  # [1 -> 39]
 X2 = list(range(N+2, 2*N+1))  # [1-39]
@@ -438,11 +465,10 @@ def random_mutation(c):
         p = 0
     c[x1] = random.uniform(0, 1)
     c[x2] = p
-    c[x3] = random.uniform(0, 1)
+    c[x3] = random.uniform(0.3, 1)
     c[x4] = random.uniform(0, 1)
     c[x5] = random.uniform(0, 1)
     c[x6] = random.uniform(0, 1)
-
 
 def choose1(population):
     """
@@ -502,6 +528,7 @@ def init_population1(size):
             o = init_one_child1()
         a.append(o)
     return a
+
 def init_population2(size):
     """
         init population
@@ -520,12 +547,11 @@ def init_population2(size):
 
 
 size = 100
-nums_generation = 10000
+nums_generation = 7000
 mutation_rate = 0.1
 
 population1 = init_population1(size)
 population2 = init_population2(size)
-
 
 plt.ion()
 figure = plt.figure()
@@ -563,7 +589,7 @@ ax.text(q_I2[0], q_I2[1], q_I2[2], "Start2", color="green")
 ax.scatter(q_F2[0], q_F2[1], q_F2[2], color="yellow", s=50) 
 ax.text(q_F2[0], q_F2[1], q_F2[2], "Finish1", color="green")
 
-
+# pdb.set_trace()
 g = []
 
 population1.sort(key=fitness1, reverse=True)
@@ -592,7 +618,6 @@ for i in range(nums_generation):
     line2.set_ydata(y2)
     line2.set_3d_properties(z2)
 
-
     figure.canvas.draw()
     figure.canvas.flush_events()
 
@@ -604,12 +629,12 @@ for i in range(nums_generation):
         next1.append(x)
         next1.append(y)
 
-    # mutation
+    # mutation, each individial has mutation_rate chance to mutate (0.1: 100->10)
     muta = random.sample(next1, int(mutation_rate*size))
     for i in muta:
         random_mutation(i)
 
-    # group population
+    # group population, ex: 100+100=200
     population1 = population1 + next1
 
     # sort by fitness function
@@ -618,11 +643,11 @@ for i in range(nums_generation):
 
     # population = population[:size] # choose 50% best
 
-    # choose 40% best, 30% medium, 30% bad
+    # choose 40% best, 40% medium, 20% bad
     _size = 2 * size
-    t2 = int(size * 2 / 5)
-    t3 = int(size / 5)
-    t1 = size - t2 - t3
+    t2 = int(size * 2 / 5) #40
+    t3 = int(size / 5) #20
+    t1 = size - t2 - t3 #40
     population1 = population1[:t1] + \
         population1[_size//3:_size//3+t2] + population1[-t3:]
     
@@ -648,7 +673,7 @@ for i in range(nums_generation):
 
     # population = population[:size] # choose 50% best
 
-    # choose 40% best, 30% medium, 30% bad
+    # choose 40% best, 40% medium, 20% bad
     _size = 2 * size
     t2 = int(size * 2 / 5)
     t3 = int(size / 5)
@@ -696,9 +721,9 @@ ax.text(q_F2[0], q_F2[1], q_F2[2], "Finish1", color="green")
 
 plt.show()
 
-with open("result.txt", "a+") as f:
+with open("Parameter.txt", "a+") as f:
     f.write(json.dumps(population1[0]))
     f.write(json.dumps(population2[0]))
-with open("xxxx.txt", "a+") as f:
+with open("Throughput.txt", "a+") as f:
     f.write(json.dumps(g) + "\n")
 print("Result:", fitness1(population1[0], log=True) + fitness2(population2[0], log = True))
